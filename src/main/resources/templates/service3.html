@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8"/>
+	<head>
+		<title>Weather Conditions Service</title>
+		<style>
+			table, th, td {
+			   border: 1px solid black;
+			   border-spacing: 0px;
+			   margin-left: 150px;
+			}
+			th {
+				padding: 10px;
+				margin-left: 250px;
+				background-color: #4CAF50;
+    			color: white;
+			}
+			td {
+				padding: 10px;
+				margin-left: 250px;
+			}
+			body {
+				font: 11px sans-serif;
+			}
+			
+			.line {
+  				fill: none;
+  				stroke: steelblue;
+  				stroke-width: 2px;
+			}
+			.axis {
+	 			font: 10px sans-serif;
+			}
+
+			.axis path,
+			.axis line {
+	 			fill: none;
+	 			stroke: #000;
+	 			shape-rendering: crispEdges;
+			}
+			input[type=text] {
+    			width: 250px;
+    			box-sizing: border-box;
+    			border: 2px solid #ccc;
+    			border-radius: 4px;
+    			font-size: 14px;
+    			background-color: white;
+    			background-image: url("img/searchicon.png");
+    			background-position: 10px 10px; 
+    			background-repeat: no-repeat;
+    			padding: 12px 20px 12px 40px;
+			}
+			#search-form
+			{
+				margin-left: 150px;
+				margin-bottom:25px;
+			}
+			#search-protected{
+				margin-left: 150px;
+			}
+			#button {
+    			background-color: #4CAF50; /* Green */
+    			border: none;
+    			border-radius: 4px;
+    			color: white;
+    			padding: 15px 32px;
+    			width: 100px;
+    			text-align: center;
+    			text-decoration: none;
+    			display: inline-block;
+    			font-size: 14px;
+			}
+		</style>
+	</head>
+	<body>					
+		<h2 id="search-protected">Weather Conditions</h2>
+		<form id="search-form" action="/search3" method="POST">
+			<input type="text" name="search" id="search" th:value="${search}" />
+			<input id="button" type="submit" value="Search" />
+		</form>
+		<br />
+		<table>
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>NAME</th>
+					<th>LOCATION</th>
+					<th>LAT</th>
+					<th>LON</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="area : ${areaList}">
+					<td th:text="${area.WDPAID}"></td>
+					<td th:text="${area.NAME}"></td>
+					<td th:text="${area.SUB_LOC}"></td>
+					<td th:text="${area.LAT}"></td>
+					<td th:text="${area.LON}"></td>
+				</tr>
+			</tbody>
+		</table>
+		<br />
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.js"></script>
+		<script th:inline="javascript">
+
+			// set the dimensions and margins of the graph
+			var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    			width = 960 - margin.left - margin.right,
+    			height = 500 - margin.top - margin.bottom;
+    
+			var parseDate = d3.timeParse("%Y%m");
+			
+			// set the ranges
+			var x = d3.scaleTime().range([0, width]);
+			var y = d3.scaleLinear().range([height, 0]);
+			
+			var xAxis = d3.axisBottom(x);
+			var yAxis = d3.axisLeft(y);
+			
+			// define the 1st line
+			var valueline = d3.line()
+			    .x(function(d) { return x(d.date); })
+			    .y(function(d) { return y(d.value); });
+			
+			// define the 2nd line
+			var valueline2 = d3.line()
+			    .x(function(d) { return x(d.date); })
+			    .y(function(d) { return y(d.value); });
+			    
+			var valueline3 = d3.line()
+			    .x(function(d) { return x(d.date); })
+			    .y(function(d) { return y(d.value); });
+			    
+			var valueline4 = d3.line()
+			    .x(function(d) { return x(d.date); })
+			    .y(function(d) { return y(d.value); });
+
+			function removeDuplicate(arr, prop) {
+				var new_arr = [];
+				var lookup = {};
+				for (var i in arr) {
+    				lookup[arr[i][prop]] = arr[i];
+				}
+				for (i in lookup) {
+    				new_arr.push(lookup[i]);
+				}
+				return new_arr;
+			}
+
+		/*<![CDATA[*/
+		    var minEvents = /*[[${minList}]]*/;
+		    var maxEvents = /*[[${maxList}]]*/;
+			var snowEvents = /*[[${snowList}]]*/;
+			var precipEvents = /*[[${precipList}]]*/;
+		    var minData = JSON.parse(minEvents);
+		    var maxData = JSON.parse(maxEvents);
+			var snowData = JSON.parse(snowEvents);
+			var precipData = JSON.parse(precipEvents);
+		/*]]>*/
+
+			if(minData != 'null'){
+			    for (var i in minData) {
+		        	minData[i].date = parseDate(minData[i].date);
+		        	
+			        minData[i].value = (+(minData[i].value))/10;
+			    }	
+			    var minD = removeDuplicate(minData, 'date');
+			    minD.sort(function(a, b) {
+	    			return b.date - a.date;
+				});
+	    	}
+	    	if(maxData != 'null'){
+			    for (var i in maxData) {
+		        	maxData[i].date = parseDate(maxData[i].date);
+		        	
+			        maxData[i].value = (+(maxData[i].value))/10;
+			    }	
+			    var maxD = removeDuplicate(maxData, 'date');
+			    maxD.sort(function(a, b) {
+	    			return b.date - a.date;
+				});
+	    	}
+	    	if(snowData != 'null'){
+			    for (var i in snowData) {
+		        	snowData[i].date = parseDate(snowData[i].date);
+		        	
+			        snowData[i].value = +(snowData[i].value);
+			    }	
+			    var snowD = removeDuplicate(snowData, 'date');
+			    snowD.sort(function(a, b) {
+	    			return b.date - a.date;
+				});
+	    	}
+	    	if(precipData != 'null'){
+			    for (var i in precipData) {
+		        	precipData[i].date = parseDate(precipData[i].date);
+		        	
+			        precipData[i].value = (+(precipData[i].value))/10;
+			    }	
+			    var precipD = removeDuplicate(precipData, 'date');
+			    precipD.sort(function(a, b) {
+	    			return b.date - a.date;
+				});
+	    	}
+			/*<![CDATA[*/
+			if(minData || maxData || snowData || precipData){
+				// append the svg obgect to the body of the page
+				// appends a 'group' element to 'svg'
+				// moves the 'group' element to the top left margin
+				var svg = d3.select("body").append("svg")
+				    .attr("width", width + margin.left + margin.right)
+				    .attr("height", height + margin.top + margin.bottom)
+				  .append("g")
+				    .attr("transform",
+				          "translate(" + margin.left + "," + margin.top + ")")
+
+				var ordinal = d3.scaleOrdinal()
+	  				.domain(["Rainfall (mm)", "TMax (degrees C)", "TMin (degrees C)", "Snowfall (mm)", "e"])
+	  				.range([ "purple", "red", "steelblue", "orange", "orange"]);
+
+				svg.append("g")
+				    .attr("class", "legendOrdinal")
+	 				.attr("transform", "translate(790,20)");
+					
+				// Scale the range of the data
+				x.domain(d3.extent(maxD, function(d) { return d.date; }));
+				y.domain([d3.min(minD, function(d) { return d.value; }),
+					d3.max(maxD, function(d) { return d.value; })]);
+				
+				// Add the valueline path.
+				svg.append("path")
+				    .data([minD])
+				    .attr("class", "line")
+					.style("stroke", "steelblue")
+				    .attr("d", valueline);
+				
+				// Add the valueline2 path.
+				svg.append("path")
+				    .data([maxD])
+				    .attr("class", "line")
+				    .style("stroke", "red")
+				    .attr("d", valueline2);
+				  
+				svg.append("path")
+				    .data([precipD])
+				    .attr("class", "line")
+				    .style("stroke", "purple")
+				    .attr("d", valueline3);
+				  
+				svg.append("path")
+				    .data([snowD])
+				    .attr("class", "line")
+				    .style("stroke", "orange")
+				    .attr("d", valueline4);
+				
+				svg.append("text")             
+			     	.attr("class", "label")
+			      	.attr("x", width)
+			      	.attr("y", height-6)
+			      	.attr("transform", "rotate(0)")
+	      			.style("text-anchor", "end")
+	      			.text("Date");
+				
+				svg.append("text")
+			      	.attr("class", "label")
+			      	.attr("transform", "rotate(-90)")
+			      	.attr("y", 6)
+			      	.attr("dy", ".71em")
+	      			.style("text-anchor", "end")
+	      			.text("Amount"); 
+			      
+				// Add the X Axis
+				svg.append("g")
+				    .attr("transform", "translate(0," + height + ")")
+				    .call(xAxis);
+				
+				// Add the Y Axis
+				svg.append("g")
+				    .call(yAxis);
+				
+				var legendOrdinal = d3.legendColor()
+	   				.shape("line")
+	   				.shapeHeight(10)
+	  				.shapePadding(10)
+	  				//use cellFilter to hide the "e" cell
+	  				.cellFilter(function(d){ return d.label !== "e" })
+	  				.scale(ordinal);
+	  			
+	  			svg.select(".legendOrdinal")
+	  				.call(legendOrdinal);
+	  			
+	  			function tabulate(data, columns, headers) {
+					var table = d3.select('body').append('table')
+					var thead = table.append('thead')
+					var	tbody = table.append('tbody');
+
+					// append the header row
+					thead.append('tr')
+		  				.selectAll('th')
+		  				.data(headers).enter()
+		  				.append('th')
+		    			.text(function (header) { return header; });
+
+					// create a row for each object in the data
+					var rows = tbody.selectAll('tr')
+		  				.data(data)
+		  				.enter()
+		  				.append('tr');
+
+					// create a cell in each row for each column
+					var cells = rows.selectAll('td')
+		  				.data(function (row) {
+		    				return columns.map(function (column) {
+		      				return {column: column, value: row[column]};
+		    		});
+		  		})
+		  			.enter()
+		  			.append('td')
+		    		.text(function (d) { return d.value; });
+
+	  			return table;
+			}
+			minD.sort(function(a, b) {
+	    		return a.value - b.value;
+			});
+			var topTenMin = minD.slice(0); 
+			topTenMin = topTenMin.slice(0, 10);
+			
+			maxD.sort(function(a, b) {
+	    		return b.value - a.value;
+			});
+			var topTenMax = maxD.slice(0); 
+			topTenMax = topTenMax.slice(0, 10);
+			
+			snowD.sort(function(a, b) {
+	    		return b.value - a.value;
+			});
+			var topTenSnow = snowD.slice(0); 
+			topTenSnow = topTenSnow.slice(0, 10);
+			
+			precipD.sort(function(a, b) {
+	    		return b.value - a.value;
+			});
+			var topTenPrecip = precipD.slice(0); 
+			topTenPrecip = topTenPrecip.slice(0, 10);
+
+			// render the table(s)
+			var topTen = topTenMin.concat(topTenMax).concat(topTenSnow).concat(topTenPrecip);
+			tabulate(topTen, ['type', 'value','date'], ['Type', 'Value','Date']);
+	  	}
+	  	/*]]>*/
+			  
+		</script>
+				
+	</body>
+</html>

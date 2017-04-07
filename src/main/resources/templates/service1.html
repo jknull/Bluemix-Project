@@ -1,0 +1,103 @@
+<!DOCTYPE HTML> 
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Protected Areas Service</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		
+		<style>
+			body {
+				background-image: url("img/vikram.jpg");
+				font: 11px sans-serif;
+				    
+            }
+			table, th, td {
+			   border: 1px solid black;
+			   border-spacing: 0px;
+			   margin-left: 150px;
+			}
+			th {
+				padding: 10px;
+				margin-left: 250px;
+				background-color: #4CAF50;
+    			color: white;
+			}
+			td {
+				padding: 10px;
+				margin-left: 250px;
+			}
+			#search-form
+			{
+				margin-left: 150px;
+				margin-bottom:25px;
+			}
+			input[type=text] {
+    			width: 250px;
+    			box-sizing: border-box;
+    			border: 2px solid #ccc;
+    			border-radius: 4px;
+    			font-size: 14px;
+    			background-color: white;
+    			background-image: url("img/searchicon.png");
+    			background-position: 10px 10px; 
+    			background-repeat: no-repeat;
+    			padding: 12px 20px 12px 40px;
+			}
+			#search-protected{
+				margin-left: 150px;
+			}
+			#button {
+    			background-color: #4CAF50; /* Green */
+    			border: none;
+    			border-radius: 4px;
+    			color: white;
+    			padding: 15px 32px;
+    			width: 100px;
+    			text-align: center;
+    			text-decoration: none;
+    			display: inline-block;
+    			font-size: 14px;
+			}
+		</style>
+	</head>
+	<body>
+	<h2 id="search-protected">Protected Areas</h2>
+		<form id="search-form" action="/search1" method="POST">
+			<input type="text" name="search" id="search" th:value="${search}" />
+			<input id="button" type="submit" value="Search" />
+		</form>
+		
+		<table>
+			<thead>
+				<tr>
+					<th>NAME</th>
+					<th>COUNTRY</th>
+					<th>STATUS</th>
+					<th>YEAR</th>
+					<th>DESIGNATION</th>
+					<th>GOVERANCE</th>
+					<th>SURFACE</th>					
+					<th>LATITUDE</th>
+					<th>LONGITUDE</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="protected : ${protectedList}">
+					<td th:text="${protected.NAME}"></td>
+					<td  th:text="${protected.ISO3}"></td>
+					<td  th:text="${protected.STATUS}"></td>
+					<td  th:text="${protected.OWN_TYPE}"></td>
+					<td th:text="${protected.DESIG_TYPE}"></td>
+					<td  th:text="${protected.GOV_TYPE}"></td>
+					<td th:text="${protected.NO_TK_AREA}"></td>	
+					<td id="longi" th:text="${protected.LAT}"></td>
+					<td  id="latitude" th:text="${protected.LON}"></td>
+				</tr>
+					
+			</tbody>
+		</table>
+		<br />
+		<div id="map" style="width:70%;height:600px;margin-left: 250px;"></div>
+		<script type="text/javascript" th:src="@{/js/script.js}" ></script>
+	    <script type="text/javascript"  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKO-de74gkJW_zNBZHTz6-Z6iq5O2_eM4&amp;callback=initMap"></script>
+	</body>
+</html>

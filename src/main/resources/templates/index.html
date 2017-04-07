@@ -1,0 +1,50 @@
+<html>
+<meta charset="UTF-8"/>
+	<head>
+		<title>Welcome</title>
+		<style>
+			table, th, td {
+			   border: 1px solid black;
+			   border-spacing: 0px;
+			}
+			th, td {
+				padding: 10px;
+			}
+			body {
+				font: 11px sans-serif;
+				margin-left: 500px;
+				margin-top: 150px;
+			}
+			#search-protected{
+				margin-left: -30px;
+			}
+			#button {
+    			background-color: #4CAF50; /* Green */
+    			border: none;
+    			border-radius: 4px;
+    			color: white;
+    			padding: 15px 32px;
+    			width: 250px;
+    			text-align: center;
+    			text-decoration: none;
+    			display: inline-block;
+    			font-size: 14px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1 id="search-protected">Protected Areas Insights (PAI)</h1>
+		<form action="/searcharea" method="POST">
+			<input id="button" type="submit" value="Search for a Protected Area" />
+		</form>
+		<form action="/searchevents" method="POST">
+			<input id="button" type="submit" value="Search for Storm Events" />
+		</form>
+		<form action="/searchweather" method="POST">
+			<input id="button" type="submit" value="Search for Weather Conditions" />
+		</form>
+			<form action="/searchprediction" method="POST">
+			<input id="button" type="submit" value="Search for Storm Predictions" />
+		</form>
+	</body>
+</html>

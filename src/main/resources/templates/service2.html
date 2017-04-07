@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8"/>
+	<head>
+		<title>Storm Events Service</title>
+		<style>
+			table, th, td {
+			   border: 1px solid black;
+			   border-spacing: 0px;
+			   margin-left: 150px;
+			}
+			th {
+				padding: 10px;
+				margin-left: 250px;
+				background-color: #4CAF50;
+    			color: white;
+			}
+			td {
+				padding: 10px;
+				margin-left: 250px;
+			}
+			body {
+				font: 11px sans-serif;
+			}
+			
+			.axis path,
+			.axis line {
+			  fill: none;
+			  stroke: #000;
+			  shape-rendering: crispEdges;
+			}
+			
+			.dot {
+			  stroke: #000;
+			}
+			
+			.tooltip {
+			  position: absolute;
+			  width: 200px;
+			  height: 30px;		
+			  pointer-events: none;
+			}
+			input[type=text] {
+    			width: 250px;
+    			box-sizing: border-box;
+    			border: 2px solid #ccc;
+    			border-radius: 4px;
+    			font-size: 14px;
+    			background-color: white;
+    			background-image: url("img/searchicon.png");
+    			background-position: 10px 10px; 
+    			background-repeat: no-repeat;
+    			padding: 12px 20px 12px 40px;
+			}
+			#search-form
+			{
+				margin-left: 150px;
+				margin-bottom:25px;
+			}
+			#search-protected{
+				margin-left: 150px;
+			}
+			#button {
+    			background-color: #4CAF50; /* Green */
+    			border: none;
+    			border-radius: 4px;
+    			color: white;
+    			padding: 15px 32px;
+    			width: 100px;
+    			text-align: center;
+    			text-decoration: none;
+    			display: inline-block;
+    			font-size: 14px;
+			}	
+		</style>
+	</head>
+	<body>					
+		<h2 id="search-protected">Storm Events</h2>
+		<form id="search-form" action="/search2" method="POST">
+			<input type="text" name="search" id="search" th:value="${search}" />
+			<input id="button" type="submit" value="Search" />
+		</form>
+		<br />
+		<table>
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>NAME</th>
+					<th>LOCATION</th>
+					<th>LAT</th>
+					<th>LON</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="area : ${areaList}">
+					<td th:text="${area.WDPAID}"></td>
+					<td th:text="${area.NAME}"></td>
+					<td th:text="${area.SUB_LOC}"></td>
+					<td th:text="${area.LAT}"></td>
+					<td th:text="${area.LON}"></td>
+				</tr>
+			</tbody>
+		</table>
+		<br />
+		
+		<script src="http://d3js.org/d3.v3.min.js"/>
+		
+		<script th:inline="javascript">
+		var margin = {top: 20, right: 20, bottom: 30, left: 80},
+		    width = 960 - margin.left - margin.right,
+		    height = 500 - margin.top - margin.bottom;
+		
+		/* 
+		 * value accessor - returns the value to encode for a given data object.
+		 * scale - maps value to a visual display encoding, such as a pixel position.
+		 * map function - maps from data value to display value
+		 * axis - sets up axis
+		 */ 
+		
+		// setup x    
+		var xValue = function(d) { return d.BEGIN_DATE_TIME;}, // data -> value
+		    xScale = d3.time.scale().range([0,width]), // value -> display
+		    xMap = function(d) { return xScale(xValue(d));}, // data -> display
+		    xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+		
+		// setup y
+		var yValue = function(d) { return d.DAMAGE_PROPERTY;}, // data -> value
+		    yScale = d3.scale.linear().range([height, 0]), // value -> display
+		    yMap = function(d) { return yScale(yValue(d));}, // data -> display
+		    yAxis = d3.svg.axis().scale(yScale).orient("left");
+		
+		// setup fill color
+		var cValue = function(d) { return d.EVENT_TYPE;},
+		    color = d3.scale.category20();
+		
+		// add the graph canvas to the body of the webpage
+		var svg = d3.select("body").append("svg")
+		    .attr("width", width + margin.left + margin.right)
+		    .attr("height", height + margin.top + margin.bottom)
+		  .append("g")
+		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
+		// add the tooltip area to the webpage
+		var tooltip = d3.select("body").append("div")
+		    .attr("class", "tooltip")
+		    .style("opacity", 0);
+		
+		// load data
+		var parseDate = d3.time.format("%d-%b-%y %H:%M:%S").parse;
+		/*<![CDATA[*/
+		    var events = /*[[${eventList}]]*/;
+		    var data = JSON.parse(events);
+		/*]]>*/
+		
+	
+		if(data != 'null'){
+		    for (var i in data) {
+	        	data[i].BEGIN_DATE_TIME = parseDate(data[i].BEGIN_DATE_TIME);
+	        	
+		        if(data[i].DAMAGE_PROPERTY){
+		            var suffix = data[i].DAMAGE_PROPERTY.substring(data[i].DAMAGE_PROPERTY.length-1, data[i].DAMAGE_PROPERTY.length);
+		            // remove K and multiply value by 1,000
+		            if(suffix == 'K'){
+		                var value = data[i].DAMAGE_PROPERTY.substring(0, data[i].DAMAGE_PROPERTY.length-1);
+		                data[i].DAMAGE_PROPERTY = (+value)*1000.00;
+		            }
+		            // remove M and multiply value by 1,000,000
+		            else if(suffix == 'M'){
+		                var value = data[i].DAMAGE_PROPERTY.substring(0, data[i].DAMAGE_PROPERTY.length-1);
+		                data[i].DAMAGE_PROPERTY = (+value)*1000000.00;
+		            }
+		            // value does not need to be expanded, leave as is
+		            else{
+		                data[i].DAMAGE_PROPERTY = +data[i].DAMAGE_PROPERTY;
+		            }
+		        }
+		        // missing value or NaN
+		        else{
+		            data[i].DAMAGE_PROPERTY = 0;
+		        }    
+		    }
+		    data.sort(function(a, b) {
+    			return b.DAMAGE_PROPERTY - a.DAMAGE_PROPERTY;
+			});
+			var topTen = data.slice(0); 
+			topTen = topTen.slice(0, 10);
+			data = data.slice(10, data.length);
+
+			
+    	}
+    		
+		
+		  // don't want dots overlapping axis, so add in buffer to data domain
+		  xScale.domain([new Date(1996, 12), new Date(2017, 1)]);
+		  yScale.domain([d3.min(data, yValue)-1, d3.max(data, yValue)+1]);
+		
+		  // x-axis
+		  svg.append("g")
+		      .attr("class", "x axis")
+		      .attr("transform", "translate(0," + height + ")")
+		      .call(xAxis)
+		    .append("text")
+		      .attr("class", "label")
+		      .attr("x", width)
+		      .attr("y", -6)
+		      .attr("transform", "rotate(0)")
+		      .style("text-anchor", "end")
+		      .text("Year");
+		
+		  // y-axis
+		  svg.append("g")
+		      .attr("class", "y axis")
+		      .call(yAxis)
+		    .append("text")
+		      .attr("class", "label")
+		      .attr("transform", "rotate(-90)")
+		      .attr("y", 6)
+		      .attr("dy", ".71em")
+		      .style("text-anchor", "end")
+		      .text("Damages ($)");
+		
+		  // draw dots
+		  svg.selectAll(".dot")
+		      .data(data)
+		    .enter().append("circle")
+		      .attr("class", "dot")
+		      .attr("r", 3.5)
+		      .attr("cx", xMap)
+		      .attr("cy", yMap)
+		      .style("fill", function(d) { return color(cValue(d));}) 
+		      .on("mouseover", function(d) {
+		          tooltip.transition()
+		               .duration(200)
+		               .style("opacity", .9);
+		          tooltip.html( "<center />"+"Event ID: "+d.EVENT_ID+"<br />Storm Type: "+d.EVENT_TYPE +"<br />Damage Cost: $"+d.DAMAGE_PROPERTY+"<br />Date: "+d.BEGIN_DATE_TIME+"<br />Description: "+d.EPISODE_NARRATIVE+"<br />"+d.EVENT_NARRATIVE)
+		          		.style("left", (width+(width/7)) + "px")		
+                		.style("top", (height-(height/2)) + "px");
+		      })
+		      .on("mouseout", function(d) {
+		          tooltip.transition()
+		               .duration(500)
+		               .style("opacity", 0);
+		      });
+		
+		  // draw legend
+		  var legend = svg.selectAll(".legend")
+		      .data(color.domain())
+		    .enter().append("g")
+		      .attr("class", "legend")
+		      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+		
+		  // draw legend colored rectangles
+		  legend.append("rect")
+		      .attr("x", width - 18)
+		      .attr("width", 18)
+		      .attr("height", 18)
+		      .style("fill", color);
+		
+		  // draw legend text
+		  legend.append("text")
+		      .attr("x", width - 24)
+		      .attr("y", 9)
+		      .attr("dy", ".35em")
+		      .style("text-anchor", "end")
+		      .text(function(d) { return d;})
+		
+		
+			    
+		function mouseOver() {
+		    document.getElementById(d.EVENT_TYPE);
+		}
+		
+		function tabulate(data, columns, headers) {
+			var table = d3.select('body').append('table')
+			var thead = table.append('thead')
+			var	tbody = table.append('tbody');
+
+			// append the header row
+			thead.append('tr')
+		  		.selectAll('th')
+		  		.data(headers).enter()
+		  		.append('th')
+		    	.text(function (header) { return header; });
+
+			// create a row for each object in the data
+			var rows = tbody.selectAll('tr')
+		  		.data(data)
+		  		.enter()
+		  		.append('tr');
+
+			// create a cell in each row for each column
+			var cells = rows.selectAll('td')
+		  		.data(function (row) {
+		    		return columns.map(function (column) {
+		      		return {column: column, value: row[column]};
+		    	});
+		  	})
+		  		.enter()
+		  		.append('td')
+		    	.text(function (d) { return d.value; });
+
+	  		return table;
+		}
+
+		// render the table(s)
+		tabulate(topTen, ['EVENT_ID', 'BEGIN_DATE_TIME', 'EVENT_TYPE', 
+			'DAMAGE_PROPERTY', 'EPISODE_NARRATIVE', 'EVENT_NARRATIVE'], ['ID', 'Date', 'Event Type', 
+			'Damage Cost ($)', 'Episode Narrative', 'Event Narrative']);
+		
+		
+		</script>
+	</body>
+</html>

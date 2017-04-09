@@ -19,6 +19,10 @@ Local instructions:
 	$ start mongo.exe
 	```
 4.	In Mongo, create the database called stormdb, then exit Mongo.
+	```
+	$ create stormdb
+	$ exit
+	```
 5.	Import the data into stormdb with the following commands:
 	```
 	$ mongoimport -d stormdb -c areas --type csv --file protected_areas_na.csv --headerline

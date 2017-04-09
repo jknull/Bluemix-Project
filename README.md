@@ -13,20 +13,18 @@ Local instructions:
 
  	>$ cd Server/3.4/bin
 3. 	Copy all 4 .csv files to this folder: protected_areas_na.csv, StormEvents_details-ftp_v1.0.csv, Monthly_All_GEO.csv, storms_sorted2.csv
- 	>$ start mongod.exe
-	
-	>$ start mongo.exe
+	```
+ 	$ start mongod.exe	
+	$ start mongo.exe
+	```
 4.	In Mongo, create the database called stormdb, then exit Mongo.
 5.	Import the data into stormdb with the following commands:
-	>$ mongoimport -d stormdb -c areas --type csv --file protected_areas_na.csv --headerline
-	
-	>$ mongoimport -d stormdb -c storm_events --type csv --file StormEvents_details-ftp_v1.0.csv --headerline
-	
-	>$ mongoimport -d stormdb -c weather_conditions --type csv --file Monthly_All_GEO.csv --headerline
-	
-	>$ mongoimport -d stormdb -c predictions --type csv --file storms_sorted2.csv --headerline
-
-
+	```
+	$ mongoimport -d stormdb -c areas --type csv --file protected_areas_na.csv --headerline
+	$ mongoimport -d stormdb -c storm_events --type csv --file StormEvents_details-ftp_v1.0.csv --headerline
+	$ mongoimport -d stormdb -c weather_conditions --type csv --file Monthly_All_GEO.csv --headerline
+	$ mongoimport -d stormdb -c predictions --type csv --file storms_sorted2.csv --headerline
+	```
 #Opening project in Eclipse
 
 1.	Clone this project.
@@ -44,7 +42,8 @@ Local instructions:
 13.	Run As > Maven generate-sources.
 14.	Run As > Maven Install.
 15.	Before running the application, start the mongod server:
-
-	>$ start mongod.exe
+	```
+	$ start mongod.exe
+	```
 16. Finally, to run the application, Run As > Spring Boot App.
 17. Application is running at localhost:8080.

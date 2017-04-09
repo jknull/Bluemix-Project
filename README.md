@@ -10,8 +10,9 @@ Local instructions:
 
 1. 	Install MongoDB.
 2. 	Open the terminal in the MongoDB folder.
-
- 	>$ cd Server/3.4/bin
+	```
+ 	$ cd Server/3.4/bin
+	```
 3. 	Copy all 4 .csv files to this folder: protected_areas_na.csv, StormEvents_details-ftp_v1.0.csv, Monthly_All_GEO.csv, storms_sorted2.csv
 	```
  	$ start mongod.exe	

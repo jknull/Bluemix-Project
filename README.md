@@ -20,8 +20,8 @@ Local instructions:
 	```
 4.	In Mongo, create the database called stormdb, then exit Mongo.
 	```
-	$ create stormdb
-	$ exit
+	mongo> create stormdb
+	mongo> exit
 	```
 5.	Import the data into stormdb with the following commands:
 	```

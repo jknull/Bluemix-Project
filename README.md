@@ -1,12 +1,12 @@
-Local instructions:
+## Local instructions:
 
-#Initial Setup (it is assumed that Java 8 is already set up)
+### Initial Setup (it is assumed that Java 8 is already set up)
 
 1.	Download Eclipse Luna: Eclipse IDE for Java Developers, version: Luna Service Release 2 (4.4.2)
 2.	Download MongoDB v3.4.2
 3.	Download Spring Framework RELEASE 4.3.7
 
-#Mongo Setup
+### Mongo Setup
 
 1. 	Install MongoDB.
 2. 	Open the terminal in the MongoDB folder.
@@ -30,7 +30,7 @@ Local instructions:
 	$ mongoimport -d stormdb -c weather_conditions --type csv --file Monthly_All_GEO.csv --headerline
 	$ mongoimport -d stormdb -c predictions --type csv --file storms_sorted2.csv --headerline
 	```
-#Opening project in Eclipse
+### Opening project in Eclipse
 
 1.	Clone this project.
 2.	Open new workspace in Eclipse, same folder the project is located.
